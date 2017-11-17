@@ -5,7 +5,7 @@ from pymessenger import Bot
 
 app = Flask(__name__)
 
-PAGE_ACCESS_TOKEN = "EAAbBcP1HPzUBAHQwUHAk3SlaizTdPyUclMVrMaRdY3uRJBItnmH6PCZCSlmEOAUzWTwZBZANfYX9RPgV1YwR2TF63f6xOImZBLt0ra1KXAG5W3K5yoOP5UYyeDmfJ3vxz3RtaOWEvjOWMWDFyEP76DC8vQPRX3UhRreNFWHXKAZDZD"
+PAGE_ACCESS_TOKEN = "<your page access token>"
 bot = Bot(PAGE_ACCESS_TOKEN)
 
 @app.route('/', methods=['GET'])
@@ -19,11 +19,12 @@ def verify():
 
 
 
-@app.route('/', methods=['POST'])
+@app.post('/')
 def webhook():
 	data = request.get_json()
 	log(data)
 
+	#Make sure this is a page subscription
 	if data['object'] == 'page':
 		for entry in data['entry']:
 			for messaging_event in entry['messaging']:
@@ -43,7 +44,13 @@ def webhook():
 					categories = wit_response(messaging_text)
 					elements = get_news_elements(categories)
 					bot.send_generic_message(sender_id, elements)
-
+	"""
+	Assume all went well.
+    
+    You must send back a 200, within 20 seconds, to let us know
+    you've successfully received the callback. Otherwise, the request
+    will time out and we will keep trying to resend.
+	"""
 	return "ok",200
 
 
